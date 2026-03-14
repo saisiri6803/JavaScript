@@ -1087,18 +1087,7 @@
       updateStats();
     }
 
-    hiddenInput.addEventListener('compositionstart', () => {
-      isComposing = true;
-    });
-
-    hiddenInput.addEventListener('compositionend', () => {
-      isComposing = false;
-      applyInputValue(hiddenInput.value);
-    });
-
-    hiddenInput.addEventListener('input', (e) => {
-      if (isComposing) return;
-      if (e.inputType === 'insertCompositionText') return;
+    hiddenInput.addEventListener('input', function () {
       applyInputValue(hiddenInput.value);
     });
 
