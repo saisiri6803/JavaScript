@@ -4,7 +4,7 @@ Welcome to the JavaScript Projects Repository! This is a monorepo containing mul
 
 ## 📁 Projects
 
-### 1. **PingPong Game** 🎮
+### 1. **PingPong Game** 
 Located in: `pingpong-game/`
 
 A classic Pong game implementation in JavaScript with:
@@ -25,7 +25,7 @@ npm install
 npm start
 ```
 
-### 2. **TypingForge** ⌨️
+### 2. **TypingForge** 
 Located in `typingforge/`
 
 A typing speed and accuracy testing application with:
