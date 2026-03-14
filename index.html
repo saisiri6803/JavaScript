@@ -570,13 +570,15 @@
     <input id="hidden-input"
       type="text"
       inputmode="text"
-      autocomplete="off"
+      autocomplete="new-password"
       autocorrect="off"
       autocapitalize="none"
+      autocomplete="off"
       spellcheck="false"
       data-gramm="false"
       data-gramm_editor="false"
       data-enable-grammarly="false"
+      enterkeyhint="next"
       aria-label="Type here"/>
   </div>
 
@@ -870,14 +872,55 @@ function updateStats() {
   document.getElementById('acc-card').classList.toggle('live', started && !finished);
 }
 
-hiddenInput.addEventListener('input', handleInput);
 hiddenInput.addEventListener('keydown', handleKeydown);
 
 let isComposing = false;
-hiddenInput.addEventListener('compositionstart', () => { isComposing = true; });
-hiddenInput.addEventListener('compositionend', (e) => {
+let lastCommittedValue = '';
+
+function applyInputValue(rawVal){
+  if(finished) return;
+
+  var val = rawVal.split('\r').join('').split('\n').join(''); 
+
+  if(val === lastCommittedValue) return;
+  lastCommittedValue = val;
+
+  if(!started && val.length>0){
+    started = true;
+    startTimer();
+    focusHint.classList.add('hidden');
+    liveGraphWrap.style.display = 'block';
+    document.getElementById('wpm-card').classList.add('live');
+  }
+
+  if(val.indexOf(' ') !== -1){
+    var typed = val.split(' ').join(' ');
+    commitWord(typed);
+    hiddenInput.value = '';
+    lastCommittedValue = '';
+    currentInput = '';
+    return;
+  }
+
+  currentInput = val;
+  updateWordDisplay(currentWordIdx, currentInput);
+  updateCaret();
+  updateStats();
+}
+
+hiddenInput.addEventListener('compositionstart', () => {
+  isComposing = true;
+});
+
+hiddenInput.addEventListener('compositionend', () => {
   isComposing = false;
-  handleInput(e);
+  applyInputValue(hiddenInput.value);
+});
+
+hiddenInput.addEventListener('input', (e) => {
+  if (isComposing) return;
+  if (e.inputType === 'insertCompositionText') return;
+  applyInputValue(hiddenInput.value);
 });
 
 function handleKeydown(e) {
@@ -896,33 +939,6 @@ function handleKeydown(e) {
 
 }
 
-function handleInput(e) {
-  if (finished) return;
-  if (isComposing) return; 
-  if (!started) {
-    started = true;
-    startTimer();
-    focusHint.classList.add('hidden');
-    liveGraphWrap.style.display = 'block';
-    document.getElementById('wpm-card').classList.add('live');
-  }
-
-  const val = hiddenInput.value;
-
-  if (val.endsWith(' ')) {
-    const typed = val.trimEnd();
-    commitWord(typed);
-    hiddenInput.value = '';
-    currentInput = '';
-    return;
-  }
-
-  currentInput = val;
-  updateWordDisplay(currentWordIdx, currentInput);
-  updateCaret();
-  updateStats();
-}
-
 function commitWord(typed) {
   const word = words[currentWordIdx];
   const minLen = Math.min(typed.length, word.length);
@@ -939,26 +955,26 @@ function commitWord(typed) {
       streak = 0;
     }
   }
-
+ 
   if (typed.length > word.length) {
     const extra = typed.length - word.length;
     totalErrors += extra;
     streak = 0;
   }
-
+ 
   if (typed.length < word.length) {
     const missing = word.length - typed.length;
     totalErrors += missing;
-    streak = 0;
-    correctChars += 0; 
+    streak = 0; 
+    correctChars += 0;  
   }
-
-  correctChars++; 
+ 
+  correctChars++;  
 
   updateWordDisplay(currentWordIdx, typed);
   currentWordIdx++;
   currentInput = '';
-
+ 
   if (currentWordIdx >= words.length - 10) {
     const more = generateWords(40);
     words.push(...more);
