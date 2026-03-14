@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PONG — Arcade</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <div id="start-screen" class="screen active">
+        <div class="screen-inner">
+            <div class="logo-wrap">
+                <div class="logo-sub">ARCADE GAME</div>
+                <h1 class="logo">PONG</h1>
+                <div class="logo-line"></div>
+            </div>
+            <p class="label">ENTER PLAYER NAME</p>
+            <div class="input-wrap">
+                <input type="text" id="player-name" placeholder="PLAYER ONE" maxlength="20" autocomplete="off">
+            </div>
+            <button id="start-btn" class="btn btn-primary">
+                <span class="btn-text">START GAME</span>
+                <div class="btn-shine"></div>
+            </button>
+            <p class="hint">← → or A D to move &nbsp;·&nbsp; mouse also works</p>
+        </div>
+    </div>
+
+    <div id="score-display">
+        <div class="score-block">
+            <div class="score-label">SCORE</div>
+            <div id="current-score" class="score-value">0</div>
+        </div>
+        <div class="score-divider">◆</div>
+        <div class="score-block">
+            <div class="score-label">BEST</div>
+            <div id="high-score" class="score-value">0</div>
+        </div>
+    </div>
+
+    <canvas id="pong" width="800" height="500"></canvas>
+
+    <div id="game-over" class="screen">
+        <div class="screen-inner">
+            <div class="go-header">
+                <span class="go-title">GAME</span>
+                <span class="go-title accent">OVER</span>
+            </div>
+            <div class="go-stats">
+                <div class="stat-row">
+                    <span class="stat-label">PLAYER</span>
+                    <span id="go-player" class="stat-val">—</span>
+                </div>
+                <div class="stat-row highlight">
+                    <span class="stat-label">SCORE</span>
+                    <span id="go-score" class="stat-val">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">BEST</span>
+                    <span id="go-highscore" class="stat-val">0</span>
+                </div>
+            </div>
+            <p class="press-hint">CLICK OR PRESS ANY KEY TO RETRY</p>
+            <button id="retry-btn" class="btn btn-primary">
+                <span class="btn-text">RETRY</span>
+                <div class="btn-shine"></div>
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
