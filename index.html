@@ -271,6 +271,8 @@
       opacity: 0;
       width: 1px; height: 1px;
       pointer-events: none;
+      top: 0; left: 0;
+      font-size: 16px; 
     }
 
     .controls {
@@ -464,11 +466,51 @@
     }
 
     @media (max-width: 640px) {
-      .stats-bar { grid-template-columns: repeat(2, 1fr); }
-      .results-card { min-width: 90vw; padding: 36px 28px; }
-      .results-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
-      .results-wpm { font-size: 4rem; }
-      #words-display { font-size: 1rem; }
+      body { padding: 0 14px 40px; }
+      header { padding: 20px 0 16px; margin-bottom: 16px; }
+      .logo { font-size: 1.1rem; }
+
+      .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; transition: all 0.3s ease; }
+      .stat-card { padding: 10px 14px; }
+      .stat-value { font-size: 1.5rem; }
+      #words-display { font-size: 1rem; line-height: 2; min-height: 100px; }
+      .typing-section { padding: 20px 18px; margin-bottom: 14px; }
+      .focus-hint { font-size: 0.75rem; }
+
+      body.keyboard-open header { display: none; }
+      body.keyboard-open .stats-bar { grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+      body.keyboard-open .stat-card { padding: 6px 8px; }
+      body.keyboard-open .stat-value { font-size: 1.1rem; }
+      body.keyboard-open .stat-label { display: none; }
+      body.keyboard-open .stat-unit { display: none; }
+      body.keyboard-open #streak-card { display: none; }
+      body.keyboard-open .live-graph { display: none !important; }
+      body.keyboard-open .controls { display: none; }
+      body.keyboard-open .kbd-hint { display: none; }
+
+      #results-overlay { align-items: flex-end; background: rgba(10,10,15,0.7); }
+      .results-card {
+        min-width: 100vw; width: 100vw;
+        border-radius: 24px 24px 0 0;
+        padding: 12px 24px 44px;
+        border-bottom: none;
+        transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+      #results-overlay.show .results-card { transform: translateY(0); }
+      .results-card::before {
+        content: ''; display: block;
+        width: 40px; height: 4px;
+        background: var(--border); border-radius: 2px;
+        margin: 0 auto 18px;
+      }
+      .results-title { margin-bottom: 14px; font-size: 0.6rem; }
+      .results-wpm { font-size: 3.6rem; margin-bottom: 2px; }
+      .results-wpm-label { margin-bottom: 18px; }
+      .results-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+      .res-stat-val { font-size: 1.4rem; }
+      .sparkline-wrap { margin-bottom: 18px; }
+      .btn-retry { width: 100%; padding: 16px; font-size: 0.9rem; border-radius: 12px; }
     }
   </style>
 </head>
@@ -525,7 +567,17 @@
   <div class="typing-section" id="typing-section">
     <div class="focus-hint" id="focus-hint">Click here or press any key to begin</div>
     <div id="words-display"></div>
-    <input id="hidden-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+    <input id="hidden-input"
+      type="text"
+      inputmode="text"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="none"
+      spellcheck="false"
+      data-gramm="false"
+      data-gramm_editor="false"
+      data-enable-grammarly="false"
+      aria-label="Type here"/>
   </div>
 
   <div class="controls">
@@ -821,6 +873,13 @@ function updateStats() {
 hiddenInput.addEventListener('input', handleInput);
 hiddenInput.addEventListener('keydown', handleKeydown);
 
+let isComposing = false;
+hiddenInput.addEventListener('compositionstart', () => { isComposing = true; });
+hiddenInput.addEventListener('compositionend', (e) => {
+  isComposing = false;
+  handleInput(e);
+});
+
 function handleKeydown(e) {
   if (e.key === 'Tab') {
     tabPressed = true;
@@ -839,6 +898,7 @@ function handleKeydown(e) {
 
 function handleInput(e) {
   if (finished) return;
+  if (isComposing) return; 
   if (!started) {
     started = true;
     startTimer();
@@ -999,6 +1059,7 @@ hiddenInput.addEventListener('blur', () => {
   focused = false;
   typingSection.classList.remove('focused');
   if (!started) focusHint.classList.remove('hidden');
+  document.body.classList.remove('keyboard-open');
 });
 
 document.addEventListener('keydown', (e) => {
@@ -1023,6 +1084,29 @@ document.getElementById('retry-btn').addEventListener('click', resetTest);
 
 words = generateWords(80);
 renderWords();
+
+
+if (window.visualViewport) {
+  let lastHeight = window.visualViewport.height;
+
+  window.visualViewport.addEventListener('resize', () => {
+    const currentHeight = window.visualViewport.height;
+    const diff = lastHeight - currentHeight;
+    const isMobile = window.innerWidth <= 640;
+
+    if (isMobile) {
+      if (diff > 100) {
+        document.body.classList.add('keyboard-open');
+        setTimeout(() => {
+          typingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      } else if (diff < -100) {
+        document.body.classList.remove('keyboard-open');
+      }
+    }
+    lastHeight = currentHeight;
+  });
+}
 </script>
 </body>
 </html>
