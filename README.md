@@ -96,6 +96,72 @@ cd ../typingforge
 npm install
 ```
 
+### 2. ***TaskFlow API***
+Located in: `Task-Flow/`
+
+A production-ready **RESTful Task Management API** built with **Node.js**, **Express**, and **MongoDB** (Mongoose). Features JWT-based authentication, full CRUD operations, aggregation-based stats, filtering, pagination, and rate limiting.
+
+##  Tech Stack
+
+| Layer        | Technology                          |
+|-------------|-------------------------------------|
+| Runtime      | Node.js 18+                        |
+| Framework    | Express.js                          |
+| Database     | MongoDB + Mongoose ODM              |
+| Auth         | JWT (jsonwebtoken) + bcryptjs       |
+| Validation   | express-validator                   |
+| Security     | helmet, cors, express-rate-limit    |
+| Testing      | Jest + Supertest + MongoMemoryServer|
+
+##  Project Structure
+
+```
+taskflow-api/
+├── src/
+│   ├── config/
+│   │   └── database.js       # Mongoose connection
+│   ├── models/
+│   │   ├── User.js            # User schema + password hashing
+│   │   └── Task.js            # Task schema + compound indexes
+│   ├── controllers/
+│   │   ├── authController.js  # Register, login, profile
+│   │   └── taskController.js  # CRUD + MongoDB aggregation stats
+│   ├── middleware/
+│   │   └── auth.js            # JWT authentication middleware
+│   ├── routes/
+│   │   ├── auth.js            # /api/auth routes
+│   │   └── tasks.js           # /api/tasks routes
+│   ├── app.js                 # Express app config
+│   └── server.js              # Entry point (connects DB then starts)
+├── tests/
+│   └── api.test.js            # Integration tests (MongoMemoryServer)
+├── .env.example
+└── package.json
+```
+
+##  Getting Started
+### Prerequisites
+- Node.js 18+
+- MongoDB (local or MongoDB Atlas cloud)
+
+### Installation
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/yourusername/taskflow-api.git
+cd taskflow-api
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment
+cp .env.example .env
+# Edit .env — set MONGODB_URI and a strong JWT_SECRET
+
+# 4. Start the server
+npm run dev       # Development (nodemon)
+npm start         # Production
+
 ## 📝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
